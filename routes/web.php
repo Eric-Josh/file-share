@@ -14,9 +14,25 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-})->middleware('auth');
+	// return view('welcome');
+	return view('pages/dashboard');
+})->middleware('auth')->name('home');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::group(['middleware' => 'auth'], function () {
+	Route::resource('user', 'UserController', ['except' => ['show']]);
+	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'ProfileController@edit']);
+	Route::put('profile', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
+	Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'ProfileController@password']);
+	Route::resource('datasource','DatasourceController');
+	Route::resource('filedump','FiledumpController');
+});
+
+Route::group(['middleware' => 'auth'], function () {
+	Route::get('{page}', ['as' => 'page.index', 'uses' => 'PageController@index']);
+	
+});
+
